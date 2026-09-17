@@ -1,17 +1,8 @@
-import { getCurrentWindow } from "@tauri-apps/api/window";
 import { getDayName, getTodayLessons, loadSchedules } from "./schedule";
 import { notify } from "./notifications";
 import { createScheduler } from "./scheduler";
 
 const scheduler = createScheduler(() => getTodayLessons());
-
-function registerWindowBehavior(): void {
-  const appWindow = getCurrentWindow();
-  appWindow.onCloseRequested(({ preventDefault }) => {
-    preventDefault();
-    appWindow.hide();
-  });
-}
 
 const dayNameElement = document.querySelector<HTMLElement>("#day-name");
 const scheduleListElement = document.querySelector<HTMLElement>("#schedule-list");
@@ -62,8 +53,6 @@ async function testNotification(): Promise<void> {
     if (statusElement) statusElement.textContent = "Չհաջողվեց ուղարկել ծանուցումը։";
   }
 }
-
-registerWindowBehavior();
 
 void loadSchedules()
   .then(() => {

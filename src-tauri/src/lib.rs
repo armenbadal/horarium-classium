@@ -1,7 +1,7 @@
 use tauri::{
     menu::{Menu, MenuItem, PredefinedMenuItem},
     tray::TrayIconBuilder,
-    Manager,
+    Manager, WindowEvent,
 };
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -12,6 +12,12 @@ pub fn run() {
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
             None,
         ))
+        .on_window_event(|window, event| {
+            if let WindowEvent::CloseRequested { api, .. } = event {
+                api.prevent_close();
+                let _ = window.hide();
+            }
+        })
         .setup(|app| {
             let open = MenuItem::with_id(app, "open", "Բացել", true, None::<&str>)?;
             let sound = MenuItem::with_id(app, "sound", "Ձայն", false, None::<&str>)?;
@@ -24,6 +30,8 @@ pub fn run() {
             )?;
 
             TrayIconBuilder::new()
+                .icon(app.default_window_icon().cloned().expect("default window icon is configured"))
+                .tooltip("Դասացուցակ")
                 .menu(&menu)
                 .on_menu_event(|app, event| match event.id.as_ref() {
                     "open" => {

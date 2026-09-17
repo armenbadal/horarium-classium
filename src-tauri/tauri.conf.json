@@ -15,7 +15,11 @@
       {
         "title": "Դասացուցակ",
         "width": 400,
-        "height": 600
+        "height": 560,
+        "resizable": false,
+        "maximizable": false,
+        "fullscreen": false,
+        "maximized": false
       }
     ],
     "security": {
