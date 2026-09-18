@@ -1,4 +1,4 @@
-name: Desktop builds
+name: Windows MSI
 
 on:
   push:
@@ -11,20 +11,8 @@ permissions:
 
 jobs:
   build:
-    name: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: windows-latest
-            bundles: msi,nsis
-          - os: macos-latest
-            bundles: app,dmg
-          - os: ubuntu-22.04
-            bundles: deb,appimage
-          - os: ubuntu-24.04
-            bundles: deb,appimage
-    runs-on: ${{ matrix.os }}
+    name: Windows MSI
+    runs-on: windows-latest
     defaults:
       run:
         working-directory: apps/student
@@ -36,24 +24,16 @@ jobs:
           cache: npm
           cache-dependency-path: apps/student/package-lock.json
       - uses: dtolnay/rust-toolchain@stable
-      - name: Linux build dependencies
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential pkg-config libwebkit2gtk-4.1-dev libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev libasound2-dev patchelf
       - run: npm ci
       - run: npm test
       - run: npm run build
       - run: cargo test --manifest-path src-tauri/Cargo.toml --lib --locked
       - run: cargo check --manifest-path src-tauri/Cargo.toml --locked
-      - name: Native bundles
-        env:
-          APPIMAGE_EXTRACT_AND_RUN: '1'
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm run tauri build -- --bundles "${{ matrix.bundles }}"
+      - name: Build MSI
+        run: npm run tauri build -- --bundles msi
       - uses: actions/upload-artifact@v4
         with:
-          name: horarium-${{ matrix.os }}
-          path: apps/student/src-tauri/target/release/bundle/
+          name: horarium-windows-msi
+          path: apps/student/src-tauri/target/release/bundle/msi/*.msi
           if-no-files-found: error
           retention-days: 7
