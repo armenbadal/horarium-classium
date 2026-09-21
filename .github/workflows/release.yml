@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   release:
-    name: Build and publish Windows MSI
+    name: Build and publish NSIS installer
     runs-on: windows-latest
     defaults:
       run:
@@ -38,8 +38,8 @@ jobs:
       - run: cargo test --manifest-path src-tauri/Cargo.toml --lib --locked
       - run: cargo check --manifest-path src-tauri/Cargo.toml --locked
 
-      - name: Build MSI
-        run: npm run tauri build -- --bundles msi
+      - name: Build NSIS installer
+        run: npm run tauri build -- --bundles nsis
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
@@ -47,4 +47,5 @@ jobs:
           name: Horarium Classium ${{ github.ref_name }}
           generate_release_notes: true
           fail_on_unmatched_files: true
-          files: apps/student/src-tauri/target/release/bundle/msi/*.msi
+          files: apps/student/src-tauri/target/release/bundle/nsis/*-setup.exe
+
