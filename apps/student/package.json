@@ -10,7 +10,9 @@
     "test": "node --test",
     "preview": "vite preview",
     "tauri": "tauri",
-    "icons": "node scripts/generate-icons.mjs"
+    "icons": "node scripts/generate-icons.mjs",
+    "format": "prettier --write \"src/**/*.{ts,js}\"",
+    "check-format": "prettier --check \"src/**/*.{ts,js}\""
   },
   "dependencies": {
     "@tauri-apps/api": "^2",
@@ -19,6 +21,7 @@
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2",
+    "prettier": "^3.9.9",
     "typescript": "~6.0.3",
     "vite": "^8.0.16"
   }

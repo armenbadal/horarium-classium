@@ -1,29 +1,29 @@
-import { lessonSummary } from "./summary";
-import { invoke } from "@tauri-apps/api/core";
-import { getDayName, getTodayLessons, loadSchedules, schedule } from "./schedule";
-import { initializeTray } from "./tray";
-import { initializeSettings } from "./settings";
-import { notify } from "./notifications";
+import { lessonSummary } from './summary';
+import { invoke } from '@tauri-apps/api/core';
+import { getDayName, getTodayLessons, loadSchedules, schedule } from './schedule';
+import { initializeTray } from './tray';
+import { initializeSettings } from './settings';
+import { notify } from './notifications';
 
-const dayNameElement = document.querySelector<HTMLElement>("#day-name");
-const scheduleListElement = document.querySelector<HTMLElement>("#schedule-list");
-const currentTimeElement = document.querySelector<HTMLTimeElement>("#current-time");
-const notificationButton = document.querySelector<HTMLButtonElement>("#notification-test");
+const dayNameElement = document.querySelector<HTMLElement>('#day-name');
+const scheduleListElement = document.querySelector<HTMLElement>('#schedule-list');
+const currentTimeElement = document.querySelector<HTMLTimeElement>('#current-time');
+const notificationButton = document.querySelector<HTMLButtonElement>('#notification-test');
 let hasSchedule = false;
-let renderedDay = "";
-const summaryElement = document.querySelector<HTMLElement>("#lesson-summary");
-const sourceElement = document.querySelector<HTMLElement>("#schedule-source");
+let renderedDay = '';
+const summaryElement = document.querySelector<HTMLElement>('#lesson-summary');
+const sourceElement = document.querySelector<HTMLElement>('#schedule-source');
 
-const statusElement = document.querySelector<HTMLElement>("#status");
+const statusElement = document.querySelector<HTMLElement>('#status');
 
 function updateCurrentTime(): void {
   if (!currentTimeElement) return;
 
   const now = new Date();
   currentTimeElement.dateTime = now.toISOString();
-  currentTimeElement.textContent = now.toLocaleTimeString("hy-AM", {
-    hour: "2-digit",
-    minute: "2-digit",
+  currentTimeElement.textContent = now.toLocaleTimeString('hy-AM', {
+    hour: '2-digit',
+    minute: '2-digit',
     hour12: false,
   });
   if (hasSchedule) {
@@ -57,15 +57,15 @@ function getLessonProgress(startText: string, endText: string, now: Date): numbe
 }
 
 function updateCurrentLesson(now: Date): void {
-  document.querySelectorAll<HTMLTableRowElement>(".schedule-table tbody tr").forEach((row) => {
-    const progress = getLessonProgress(row.dataset.start ?? "", row.dataset.end ?? "", now);
+  document.querySelectorAll<HTMLTableRowElement>('.schedule-table tbody tr').forEach((row) => {
+    const progress = getLessonProgress(row.dataset.start ?? '', row.dataset.end ?? '', now);
     const isCurrent = progress !== undefined;
-    row.classList.toggle("current-lesson", isCurrent);
-    row.setAttribute("aria-current", isCurrent ? "time" : "false");
+    row.classList.toggle('current-lesson', isCurrent);
+    row.setAttribute('aria-current', isCurrent ? 'time' : 'false');
     if (progress === undefined) {
-      row.style.removeProperty("--lesson-progress");
+      row.style.removeProperty('--lesson-progress');
     } else {
-      row.style.setProperty("--lesson-progress", `${progress}%`);
+      row.style.setProperty('--lesson-progress', `${progress}%`);
     }
   });
 }
@@ -83,28 +83,28 @@ function renderSchedule(): void {
   dayNameElement.textContent = getDayName(today.getDay() === 0 ? 7 : today.getDay());
 
   if (lessons.length === 0) {
-    const empty = document.createElement("p");
-    empty.className = "empty-day";
-    empty.textContent = "Այսօր դասեր չկան։";
+    const empty = document.createElement('p');
+    empty.className = 'empty-day';
+    empty.textContent = 'Այսօր դասեր չկան։';
     scheduleListElement.replaceChildren(empty);
     return;
   }
-  const table = document.createElement("table");
-  table.className = "schedule-table";
-  table.innerHTML = "<thead><tr><th scope=\"col\">Ժամը</th><th scope=\"col\">Դաս</th></tr></thead>";
+  const table = document.createElement('table');
+  table.className = 'schedule-table';
+  table.innerHTML = '<thead><tr><th scope="col">Ժամը</th><th scope="col">Դաս</th></tr></thead>';
 
-  const body = document.createElement("tbody");
+  const body = document.createElement('tbody');
   for (const lesson of lessons) {
-    const row = document.createElement("tr");
+    const row = document.createElement('tr');
     row.dataset.start = lesson.start;
     row.dataset.end = lesson.end;
-    const time = document.createElement("td");
-    const subject = document.createElement("td");
+    const time = document.createElement('td');
+    const subject = document.createElement('td');
     time.textContent = `${lesson.start}–${lesson.end}`;
     subject.textContent = lesson.lesson;
-    const currentLabel = document.createElement("span");
-    currentLabel.className = "current-lesson-label";
-    currentLabel.textContent = "Հիմա";
+    const currentLabel = document.createElement('span');
+    currentLabel.className = 'current-lesson-label';
+    currentLabel.textContent = 'Հիմա';
     subject.append(currentLabel);
     row.append(time, subject);
     body.append(row);
@@ -117,20 +117,20 @@ function renderSchedule(): void {
 
 function showScheduleError(error: unknown): void {
   console.error(error);
-  if (dayNameElement) dayNameElement.textContent = "Դասացուցակ";
+  if (dayNameElement) dayNameElement.textContent = 'Դասացուցակ';
   if (scheduleListElement) {
-    scheduleListElement.textContent = "Չհաջողվեց բեռնել դասացուցակը։";
+    scheduleListElement.textContent = 'Չհաջողվեց բեռնել դասացուցակը։';
   }
 }
 
 async function testNotification(): Promise<void> {
-  if (statusElement) statusElement.textContent = "Ծանուցումը ուղարկվում է…";
+  if (statusElement) statusElement.textContent = 'Ծանուցումը ուղարկվում է…';
   try {
-    await notify("Դասացուցակ", { kind: "startingSoon", body: "1 րոպեից սկսվում է «Մաթեմատիկա» դասը։" });
-    if (statusElement) statusElement.textContent = "Ծանուցումը ուղարկվեց։";
+    await notify('Դասացուցակ', { kind: 'startingSoon', body: '1 րոպեից սկսվում է «Մաթեմատիկա» դասը։' });
+    if (statusElement) statusElement.textContent = 'Ծանուցումը ուղարկվեց։';
   } catch (error) {
     console.error(error);
-    if (statusElement) statusElement.textContent = "Չհաջողվեց ուղարկել ծանուցումը։";
+    if (statusElement) statusElement.textContent = 'Չհաջողվեց ուղարկել ծանուցումը։';
   }
 }
 
@@ -138,33 +138,35 @@ updateCurrentTime();
 window.setInterval(updateCurrentTime, 15_000);
 
 async function initializeSchedule(): Promise<void> {
-  if (statusElement) statusElement.textContent = "Բեռնվում է…";
+  if (statusElement) statusElement.textContent = 'Բեռնվում է…';
   try {
     const result = await loadSchedules();
     hasSchedule = true;
     renderSchedule();
     if (sourceElement) {
       sourceElement.dataset.source = result.source;
-      sourceElement.textContent = result.source === "cached" ? "Աղբյուր՝ պահված տարբերակ" : "";
+      sourceElement.textContent = result.source === 'cached' ? 'Աղբյուր՝ պահված տարբերակ' : '';
     }
     try {
-      await invoke("update_schedule", { schedule });
-      if (statusElement) statusElement.textContent = result.warning ?? "";
+      await invoke('update_schedule', { schedule });
+      if (statusElement) statusElement.textContent = result.warning ?? '';
     } catch (error) {
-      if (statusElement) statusElement.textContent = `Դասացուցակը ցուցադրված է, բայց հիշեցումները չեն թարմացվել։ ${String(error)}`;
+      if (statusElement)
+        statusElement.textContent = `Դասացուցակը ցուցադրված է, բայց հիշեցումները չեն թարմացվել։ ${String(error)}`;
     }
   } catch (error) {
     showScheduleError(error);
     if (sourceElement) {
-      sourceElement.dataset.source = "error";
-      sourceElement.textContent = "Աղբյուր՝ սխալ";
+      sourceElement.dataset.source = 'error';
+      sourceElement.textContent = 'Աղբյուր՝ սխալ';
     }
-    if (statusElement) statusElement.textContent = `Դասացուցակը հասանելի չէ։ Ստուգեք կապը և վերագործարկեք ծրագիրը։ ${String(error)}`;
+    if (statusElement)
+      statusElement.textContent = `Դասացուցակը հասանելի չէ։ Ստուգեք կապը և վերագործարկեք ծրագիրը։ ${String(error)}`;
   }
 }
 
 void initializeTray()
-  .catch((error) => console.error("Tray listeners:", error))
+  .catch((error) => console.error('Tray listeners:', error))
   .then(initializeSettings)
   .then(initializeSchedule);
-notificationButton?.addEventListener("click", () => void testNotification());
+notificationButton?.addEventListener('click', () => void testNotification());

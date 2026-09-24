@@ -1,5 +1,5 @@
-import { stopSpeech } from "./speech";
-import { invoke } from "@tauri-apps/api/core";
+import { stopSpeech } from './speech';
+import { invoke } from '@tauri-apps/api/core';
 
 export interface Settings {
   notificationsEnabled: boolean;
@@ -19,7 +19,7 @@ export function applySettings(value: Settings): void {
 }
 
 export async function loadSettings(): Promise<Settings> {
-  applySettings(await invoke<Settings>("get_settings"));
+  applySettings(await invoke<Settings>('get_settings'));
   return settings;
 }
 
@@ -27,7 +27,8 @@ export async function initializeSettings(): Promise<void> {
   try {
     await loadSettings();
   } catch (error) {
-    const status = document.querySelector<HTMLElement>("#status");
-    if (status) status.textContent = `Չհաջողվեց բեռնել կարգավորումները։ ${String(error)}`;
+    const status = document.querySelector<HTMLElement>('#status');
+    if (status)
+      status.textContent = `Չհաջողվեց բեռնել կարգավորումները։ ${String(error)}`;
   }
 }
