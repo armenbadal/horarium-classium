@@ -1,3 +1,4 @@
+import type { Lesson } from "./types";
 import { lessonSummary } from "./summary";
 import { invoke } from "@tauri-apps/api/core";
 import { getDayName, getTodayLessons, loadSchedules, schedule } from "./schedule";
@@ -15,6 +16,36 @@ const summaryElement = document.querySelector<HTMLElement>("#lesson-summary");
 const sourceElement = document.querySelector<HTMLElement>("#schedule-source");
 
 const statusElement = document.querySelector<HTMLElement>("#status");
+
+let tooltipEl: HTMLElement | null = null;
+
+function showTooltip(lesson: Lesson, anchor: HTMLElement): void {
+  if (!tooltipEl) {
+    tooltipEl = document.createElement("div");
+    tooltipEl.className = "lesson-tooltip";
+    tooltipEl.style.position = "fixed";
+    tooltipEl.style.zIndex = "1000";
+    tooltipEl.style.pointerEvents = "none";
+    document.body.appendChild(tooltipEl);
+  }
+
+  const lines: string[] = [];
+  if (lesson.teacher) lines.push(`Ուսուցիչ՝ ${lesson.teacher}`);
+  if (lesson.note) lines.push(`Ծանոթություն՝ ${lesson.note}`);
+  if (lines.length === 0) return;
+
+  tooltipEl.innerHTML = lines.map(l => `<div>${l}</div>`).join("");
+  const rect = anchor.getBoundingClientRect();
+  tooltipEl.style.top = `${rect.bottom + 4}px`;
+  tooltipEl.style.left = `${rect.left}px`;
+  tooltipEl.style.display = "block";
+}
+
+function hideTooltip(): void {
+  if (tooltipEl) {
+    tooltipEl.style.display = "none";
+  }
+}
 
 function updateCurrentTime(): void {
   if (!currentTimeElement) return;
@@ -102,6 +133,9 @@ function renderSchedule(): void {
     const subject = document.createElement("td");
     time.textContent = `${lesson.start}–${lesson.end}`;
     subject.textContent = lesson.lesson;
+    subject.style.position = "relative";
+    subject.addEventListener("mouseenter", () => showTooltip(lesson, subject));
+    subject.addEventListener("mouseleave", hideTooltip);
     const currentLabel = document.createElement("span");
     currentLabel.className = "current-lesson-label";
     currentLabel.textContent = "Հիմա";

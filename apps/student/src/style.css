@@ -49,3 +49,18 @@ h1 { margin: 0; font-family: Georgia, serif; font-size: 31px; font-weight: 600; 
 .lesson-summary { padding: 12px; border-left: 3px solid #3d9b6b; border-radius: 6px; background: #dceee4; font-size: 13px; line-height: 1.7; }
 .empty-day { padding: 22px 14px; text-align: center; font-size: 14px; }
 #status:empty, #lesson-summary:empty, #schedule-source:empty { display: none; }
+
+.lesson-tooltip {
+  background: #173d45;
+  color: #f5fbfa;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.6;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .15);
+  max-width: 300px;
+}
+
+.lesson-tooltip div {
+  white-space: nowrap;
+}

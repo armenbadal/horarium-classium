@@ -38,7 +38,7 @@ export function validateSchedule(value: unknown): Schedule {
         throw new Error(`Invalid lesson object for ${location}.`);
       }
       for (const field of ["start", "end", "lesson"]) {
-        if (typeof lesson[field] !== "string") throw new Error(`Invalid ${field} for ${location}: expected text.`);
+        if (field in lesson && typeof lesson[field] !== "string") throw new Error(`Invalid ${field} for ${location}: expected text.`);
       }
       const timePattern = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
       for (const field of ["start", "end"]) {
@@ -62,7 +62,7 @@ export function validateSchedule(value: unknown): Schedule {
         throw new Error(`Overlapping lessons for ${dayName}: ${sorted[index - 1].start}–${sorted[index - 1].end} and ${sorted[index].start}–${sorted[index].end}.`);
       }
     }
-    validated[dayName] = sorted.map(({ start, end, lesson }) => ({ start, end, lesson: lesson.trim() }));
+    validated[dayName] = sorted.map(({ start, end, lesson, teacher, note }) => ({ start, end, lesson: lesson.trim(), ...(teacher != null ? { teacher } : {}), ...(note != null ? { note } : {}) }));
   }
 
   return validated;
