@@ -16,6 +16,9 @@ jobs:
   release:
     name: Build and publish NSIS installer
     runs-on: windows-latest
+    env:
+      VITE_SUPABASE_URL: ${{ vars.STUDENT_SUPABASE_URL }}
+      VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.STUDENT_SUPABASE_PUBLISHABLE_KEY }}
     defaults:
       run:
         working-directory: apps/student
@@ -30,6 +33,8 @@ jobs:
 
       - uses: dtolnay/rust-toolchain@stable
 
+      - name: Check public Student configuration
+        run: node scripts/check-publication-env.mjs
       - run: npm ci
       - name: Check release version
         run: npm run check:release-version -- "${{ github.ref_name }}"
