@@ -30,3 +30,7 @@ dist-ssr
 supabase/.temp/
 supabase/environments/*/supabase/.temp/
 supabase/.branches/
+
+# Local leftovers from the pre-split repository
+/apps/
+/supabase/
